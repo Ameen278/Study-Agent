@@ -1,8 +1,422 @@
-/*
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+/* ========================================
+   Local Study AI - Chat Sidebar
+   ======================================== */
 
-If your plugin does not need CSS, delete this file.
+.local-study-ai-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 12px;
+  gap: 10px;
+  box-sizing: border-box;
+}
 
-*/
+/* Chat title */
+.local-study-ai-chat h3 {
+  margin: 0;
+  padding: 4px 0 12px;
+  font-size: 18px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* Messages container */
+.local-study-ai-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 2px;
+  scroll-behavior: smooth;
+}
+
+/* Individual messages */
+.local-study-ai-message {
+  max-width: 95%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: var(--font-text-size);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* User message */
+.local-study-ai-message.user {
+  align-self: flex-end;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-bottom-right-radius: 4px;
+}
+
+/* Assistant message */
+.local-study-ai-message.assistant {
+  position: relative;
+  align-self: flex-start;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-bottom-left-radius: 4px;
+  /* Markdown needs normal whitespace; the base bubble uses pre-wrap for the
+     plain-text user messages. */
+  white-space: normal;
+}
+
+/* Markdown inside assistant bubbles: keep block spacing tight to the bubble
+   edges and stop wide content from overflowing the sidebar. Content lives in
+   a wrapper div, so the edge rules target the wrapper's children. */
+.local-study-ai-message.assistant > .local-study-ai-content > :first-child {
+  margin-top: 0;
+}
+
+.local-study-ai-message.assistant > .local-study-ai-content > :last-child {
+  margin-bottom: 0;
+}
+
+.local-study-ai-message.assistant p {
+  margin: 0.4em 0;
+}
+
+.local-study-ai-message.assistant ul,
+.local-study-ai-message.assistant ol {
+  margin: 0.4em 0;
+  padding-inline-start: 1.4em;
+}
+
+.local-study-ai-message.assistant pre,
+.local-study-ai-message.assistant table {
+  overflow-x: auto;
+}
+
+.local-study-ai-message.assistant code {
+  font-size: 0.9em;
+}
+
+.local-study-ai-message.assistant img {
+  max-width: 100%;
+  height: auto;
+}
+
+.local-study-ai-message.assistant a {
+  color: var(--text-accent);
+}
+
+/* "Thinking..." placeholder: muted, softly pulsing until the first token */
+.local-study-ai-message.local-study-ai-thinking {
+  color: var(--text-faint);
+  font-style: italic;
+  animation: local-study-ai-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes local-study-ai-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .local-study-ai-message.local-study-ai-thinking {
+    animation: none;
+    opacity: 0.75;
+  }
+}
+
+/* Copy icon: hidden until the bubble is hovered, the button is focused, or
+   a selection inside the bubble exists */
+.local-study-ai-copy {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--button-radius);
+  background: var(--background-primary);
+  color: var(--text-muted);
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.local-study-ai-copy svg {
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+
+.local-study-ai-message.assistant:hover .local-study-ai-copy,
+.local-study-ai-message.assistant.local-study-ai-copy-shown .local-study-ai-copy,
+.local-study-ai-copy:focus-visible {
+  opacity: 1;
+}
+
+.local-study-ai-copy:hover {
+  color: var(--text-normal);
+  border-color: var(--interactive-accent);
+}
+
+.local-study-ai-copy:focus-visible {
+  outline: 2px solid var(--background-modifier-border-focus);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .local-study-ai-copy {
+    transition: none;
+  }
+}
+
+/* Input form */
+.local-study-ai-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+/* Message textarea */
+.local-study-ai-form textarea {
+  width: 100%;
+  min-height: 72px;
+  max-height: 200px;
+  padding: 10px 12px;
+  resize: vertical;
+  box-sizing: border-box;
+  border-radius: var(--input-radius);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  font: inherit;
+  line-height: 1.5;
+}
+
+.local-study-ai-form textarea:focus {
+  border-color: var(--interactive-accent);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+}
+
+.local-study-ai-form textarea::placeholder {
+  color: var(--text-faint);
+}
+
+/* Provider · model line under the writing field */
+.local-study-ai-model-info {
+  font-size: 0.75em;
+  color: var(--text-faint);
+  margin-top: -2px;
+  overflow-wrap: anywhere;
+}
+
+/* Send button */
+.local-study-ai-form button {
+  align-self: flex-end;
+  padding: 7px 16px;
+  border-radius: var(--button-radius);
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.local-study-ai-form button:hover {
+  opacity: 0.85;
+}
+
+.local-study-ai-form button:active {
+  opacity: 0.7;
+}
+
+/* Scrollbar */
+.local-study-ai-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.local-study-ai-messages::-webkit-scrollbar-thumb {
+  background: var(--background-modifier-border);
+  border-radius: 6px;
+}
+
+/* Responsive sidebar */
+@media (max-width: 400px) {
+  .local-study-ai-chat {
+    padding: 8px;
+  }
+
+  .local-study-ai-message {
+    max-width: 100%;
+    padding: 8px 10px;
+  }
+}
+
+/* Form switches: context + thinking sit side by side and stack when narrow */
+.local-study-ai-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Switch card: label row with a custom switch (context or thinking) */
+.local-study-ai-switch {
+  flex: 1 1 200px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--input-radius);
+  background: var(--background-secondary);
+  font-size: var(--font-smaller);
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.local-study-ai-switch:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.local-study-ai-switch:focus-within {
+  outline: 2px solid var(--background-modifier-border-focus);
+  outline-offset: 1px;
+}
+
+.local-study-ai-switch:has(input:checked) {
+  border-color: var(--interactive-accent);
+  color: var(--text-normal);
+}
+
+/* Hide the native checkbox and draw a switch instead */
+.local-study-ai-switch input {
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 18px;
+  margin: 0;
+  appearance: none;
+  border-radius: 999px;
+  background: var(--background-modifier-border);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.local-study-ai-switch input::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-on-accent);
+  transition: transform 0.15s ease;
+}
+
+.local-study-ai-switch input:checked {
+  background: var(--interactive-accent);
+}
+
+.local-study-ai-switch input:checked::before {
+  transform: translateX(16px);
+}
+
+.local-study-ai-switch input:focus-visible {
+  outline: 2px solid var(--background-modifier-border-focus);
+  outline-offset: 2px;
+}
+
+.local-study-ai-switch input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .local-study-ai-switch,
+  .local-study-ai-switch input,
+  .local-study-ai-switch input::before {
+    transition: none;
+  }
+}
+
+/* Error note appended under a streamed reply when the stream fails mid-way */
+.local-study-ai-error {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--background-modifier-border);
+  color: var(--text-error);
+  font-size: var(--font-smaller);
+  line-height: 1.5;
+}
+
+/* Settings: multiline box for the Custom instructions field */
+.local-study-ai-custom-instructions {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+}
+
+.setting-item:has(.local-study-ai-custom-instructions) .setting-item-control {
+  flex: 1 1 auto;
+}
+
+/* Skill dropdown card: sits with the switch cards in the toggles row */
+.local-study-ai-skill {
+  flex: 1 1 200px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--input-radius);
+  background: var(--background-secondary);
+  font-size: var(--font-smaller);
+  color: var(--text-muted);
+}
+
+.local-study-ai-skill:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.local-study-ai-skill:focus-within {
+  outline: 2px solid var(--background-modifier-border-focus);
+  outline-offset: 1px;
+}
+
+.local-study-ai-skill-select {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-smaller);
+  color: var(--text-normal);
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--input-radius);
+  padding: 2px 6px;
+}
+
+/* Inline validation message in the skill modal */
+.local-study-ai-skill-error {
+  color: var(--text-error);
+}
