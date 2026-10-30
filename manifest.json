@@ -3,7 +3,7 @@
 	"name": "Study Agent",
 	"version": "1.0.0",
 	"minAppVersion": "1.7.2",
-	"description": "Chat with a local Ollama model or a cloud AI API (OpenAI, Claude, OpenRouter, Groq, Gemini, or any OpenAI-compatible server) from Ob.",
+	"description": "Chat with a local Ollama model or a cloud AI API (OpenAI, Claude, OpenRouter, Groq, Gemini, or any OpenAI-compatible server) without leaving your vault.",
 	"author": "Ameen278",
 	"authorUrl": "https://github.com/Ameen278",
 	"isDesktopOnly": false
