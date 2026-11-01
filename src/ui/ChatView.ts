@@ -148,6 +148,10 @@ export class ChatView extends ItemView {
 		});
 
 		this.contextCheckboxEl = checkbox;
+		contextToggle.toggleClass('is-checked', checkbox.checked);
+		this.registerDomEvent(checkbox, 'change', () => {
+			contextToggle.toggleClass('is-checked', checkbox.checked);
+		});
 
 		contextToggle.createSpan({
 			text: 'Use Active File as Context',
@@ -167,6 +171,7 @@ export class ChatView extends ItemView {
 		thinkCheckbox.checked = this.plugin.settings.ollamaThink;
 		this.thinkCheckboxEl = thinkCheckbox;
 		this.thinkToggleEl = thinkToggle;
+		thinkToggle.toggleClass('is-checked', thinkCheckbox.checked);
 
 		thinkToggle.createSpan({
 			text: 'Enable thinking',
@@ -175,6 +180,7 @@ export class ChatView extends ItemView {
 		this.updateThinkSwitchVisibility();
 
 		this.registerDomEvent(thinkCheckbox, 'change', () => {
+			thinkToggle.toggleClass('is-checked', thinkCheckbox.checked);
 			this.plugin.settings.ollamaThink = thinkCheckbox.checked;
 			void this.plugin.saveSettings();
 		});

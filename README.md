@@ -60,7 +60,7 @@ explained in [docs/dev/](docs/dev/).
 
 ## Requirements
 
-- Obsidian **1.7.2** or newer.
+- Obsidian **1.13.0** or newer.
 - For local chat: [Ollama](https://ollama.com/download) installed and running,
   with at least one chat model pulled, for example:
 

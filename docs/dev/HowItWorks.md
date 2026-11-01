@@ -28,7 +28,7 @@ Current features:
 
 ## Requirements
 
-- Obsidian **1.7.2** or newer.
+- Obsidian **1.13.0** or newer.
 - For local chat: Ollama installed and running (`ollama serve`) with at least
   one chat model pulled, for example:
 
@@ -378,7 +378,7 @@ Common messages and what they mean:
 - Check that the plugin is enabled.
 - Look for the bot icon in the ribbon or run **Open local study AI** from the
   command palette.
-- If `revealLeaf` fails, make sure Obsidian is at least 1.7.2.
+- If `revealLeaf` fails, make sure Obsidian is at least 1.13.0.
 
 ### Every message fails to connect
 

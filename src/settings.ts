@@ -4,6 +4,7 @@ import {
 	DropdownComponent,
 	PluginSettingTab,
 	Setting,
+	type SettingDefinitionItem,
 } from 'obsidian';
 import {
 	PROVIDER_PRESETS,
@@ -49,15 +50,75 @@ export class ObsidianAgentSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
-	display(): void {
-		const { containerEl } = this;
+	/**
+	 * Declarative definitions (Obsidian 1.13+), so the tab participates in
+	 * Settings search. Every row uses the `render` escape hatch because the
+	 * tab is highly dynamic — provider-dependent fields, async model
+	 * loading, and skill CRUD with modals — so the rows reuse the same
+	 * imperative builders as display(). display() below stays as the
+	 * fallback for Obsidian versions older than 1.13.
+	 */
+	getSettingDefinitions(): SettingDefinitionItem[] {
+		const rerender = () => this.update();
+		const config = () =>
+			this.plugin.settings.providers[this.plugin.settings.provider];
+		const preset = () =>
+			PROVIDER_PRESETS.find((p) => p.id === this.plugin.settings.provider);
 
-		containerEl.empty();
+		return [
+			{
+				name: 'AI provider',
+				render: (setting) => this.renderProviderSetting(setting, rerender),
+			},
+			{
+				name: 'Base URL',
+				render: (setting) =>
+					this.renderBaseUrlSetting(setting, config(), preset()),
+			},
+			{
+				name: 'API key',
+				visible: () =>
+					Boolean(preset()?.needsKey) ||
+					this.plugin.settings.provider === 'custom',
+				render: (setting) => this.renderApiKeySetting(setting, config()),
+			},
+			{
+				name: 'Model',
+				render: (setting) => this.renderModelSetting(setting, config()),
+			},
+			{
+				name: 'Enable thinking',
+				visible: () => this.plugin.settings.provider === 'ollama',
+				render: (setting) => this.renderThinkSetting(setting),
+			},
+			{
+				name: 'Custom instructions',
+				render: (setting) => this.renderCustomInstructionsSetting(setting),
+			},
+			{
+				name: 'Custom skills',
+				render: (setting) => {
+					// The skills section spans several rows. Reuse the
+					// framework row's place by detaching it and rendering
+					// into its parent (this definition is always last).
+					const parent = setting.settingEl.parentElement;
+					if (parent) {
+						setting.settingEl.detach();
+						renderSkillsSection(parent, this.plugin, rerender);
+					}
+				},
+			},
+		];
+	}
 
+	private renderProviderSetting(
+		setting: Setting,
+		rerender: () => void,
+	): void {
 		const settings = this.plugin.settings;
 		const preset = PROVIDER_PRESETS.find((p) => p.id === settings.provider);
 
-		new Setting(containerEl)
+		setting
 			.setName('AI provider')
 			.setDesc(
 				'Ollama runs locally; nothing leaves your computer. Cloud providers send your messages (and active-file context if enabled) to their servers.',
@@ -71,42 +132,27 @@ export class ObsidianAgentSettingTab extends PluginSettingTab {
 					if (!isProviderId(value)) return;
 					this.plugin.settings.provider = value;
 					await this.plugin.saveSettings();
-					this.display();
+					rerender();
 				});
 			});
 
 		if (preset) {
-			containerEl.createEl('p', {
-				text: preset.hint,
-				cls: 'setting-item-description',
-			});
+			setting.settingEl.insertAdjacentElement(
+				'afterend',
+				createEl('p', {
+					text: preset.hint,
+					cls: 'setting-item-description',
+				}),
+			);
 		}
-
-		const config = settings.providers[settings.provider];
-
-		this.renderBaseUrlSetting(containerEl, config, preset);
-
-		if (preset?.needsKey || settings.provider === 'custom') {
-			this.renderApiKeySetting(containerEl, config);
-		}
-
-		this.renderModelSetting(containerEl, config);
-
-		if (settings.provider === 'ollama') {
-			this.renderThinkSetting(containerEl);
-		}
-
-		this.renderCustomInstructionsSetting(containerEl);
-
-		renderSkillsSection(containerEl, this.plugin, () => this.display());
 	}
 
 	private renderBaseUrlSetting(
-		containerEl: HTMLElement,
+		setting: Setting,
 		config: ProviderConfig,
 		preset: (typeof PROVIDER_PRESETS)[number] | undefined,
 	): void {
-		new Setting(containerEl)
+		setting
 			.setName('Base URL')
 			.setDesc(
 				preset?.defaultBaseUrl
@@ -125,10 +171,10 @@ export class ObsidianAgentSettingTab extends PluginSettingTab {
 	}
 
 	private renderApiKeySetting(
-		containerEl: HTMLElement,
+		setting: Setting,
 		config: ProviderConfig,
 	): void {
-		new Setting(containerEl)
+		setting
 			.setName('API key')
 			.setDesc(
 				'Stored in plain text in this vault’s plugin data.json — anyone with access to the file can use it. Leave empty for local servers that do not require a key.',
@@ -145,13 +191,13 @@ export class ObsidianAgentSettingTab extends PluginSettingTab {
 	}
 
 	private renderModelSetting(
-		containerEl: HTMLElement,
+		setting: Setting,
 		config: ProviderConfig,
 	): void {
 		let dropdown: DropdownComponent | undefined;
 		let refreshButton: ButtonComponent | undefined;
 
-		const setting = new Setting(containerEl)
+		setting
 			.setName('Model')
 			.setDesc('Loading models...')
 			.addDropdown((component) => {
@@ -237,8 +283,8 @@ export class ObsidianAgentSettingTab extends PluginSettingTab {
 		}
 	}
 
-	private renderThinkSetting(containerEl: HTMLElement): void {
-		new Setting(containerEl)
+	private renderThinkSetting(setting: Setting): void {
+		setting
 			.setName('Enable thinking')
 			.setDesc(
 				'Let thinking models reason before answering. Disable for faster, direct replies.',
@@ -253,8 +299,9 @@ export class ObsidianAgentSettingTab extends PluginSettingTab {
 			);
 	}
 
-	private renderCustomInstructionsSetting(containerEl: HTMLElement): void {
-		new Setting(containerEl)
+	private renderCustomInstructionsSetting(setting: Setting): void {
+		setting
+			.setClass('local-study-ai-custom-instructions-item')
 			.setName('Custom instructions')
 			.setDesc(
 				'Extra instructions added to every request after the built-in study-assistant prompt. They are sent to your AI provider together with your messages.',

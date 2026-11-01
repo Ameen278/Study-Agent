@@ -61,7 +61,11 @@ visibility) refresh after every save.
 
 ## Settings tab UI
 
-`ObsidianAgentSettingTab.display()` re-renders whenever the provider changes:
+`ObsidianAgentSettingTab.getSettingDefinitions()` (the declarative settings
+API, Obsidian 1.13+) rebuilds the row list whenever the provider changes.
+Each row uses the `render` escape hatch and reuses the same imperative
+builders, because the tab is dynamic (provider-dependent fields, async model
+loading, skill CRUD with modals):
 
 1. **AI provider** — dropdown over `PROVIDER_PRESETS`; selecting one saves
    `provider` and re-renders the tab. A hint line under the dropdown explains

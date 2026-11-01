@@ -116,7 +116,7 @@ Shared class `.local-study-ai-switch` (renamed from
   gap: 10px;
   padding: 8px 10px;
   border: 1px solid var(--background-modifier-border);
-  /* hover, focus-within, and :has(input:checked) states follow */
+  /* hover, focus-within, and .is-checked states follow */
 }
 
 .local-study-ai-switch input {
@@ -131,8 +131,9 @@ Shared class `.local-study-ai-switch` (renamed from
 Details:
 
 - `flex-wrap: wrap` keeps long label text from overflowing the narrow sidebar.
-- `:has()` is supported by the Electron/Chromium versions bundled with every
-  Obsidian build at or above this plugin's `minAppVersion` (1.7.2).
+- The checked state is applied via an `is-checked` class toggled from JS on
+  the input's `change` event — `:has()` is avoided because the catalog's CSS
+  lint warns about its performance cost.
 - `user-select: none` stops text selection when clicking a switch.
 - Transitions are disabled under `prefers-reduced-motion: reduce`.
 

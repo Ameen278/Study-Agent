@@ -303,7 +303,7 @@
   outline-offset: 1px;
 }
 
-.local-study-ai-switch:has(input:checked) {
+.local-study-ai-switch.is-checked {
   border-color: var(--interactive-accent);
   color: var(--text-normal);
 }
@@ -377,7 +377,7 @@
   resize: vertical;
 }
 
-.setting-item:has(.local-study-ai-custom-instructions) .setting-item-control {
+.setting-item.local-study-ai-custom-instructions-item .setting-item-control {
   flex: 1 1 auto;
 }
 
