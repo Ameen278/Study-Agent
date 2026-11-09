@@ -1,5 +1,7 @@
 # study-agent
 
+🌐 **Website:** [ameen278.github.io/obsidian_site](https://ameen278.github.io/obsidian_site/) — features, install guide, providers, and docs.
+
 Chat with a local [Ollama](https://ollama.com/) model — or a cloud AI API
 (OpenAI, Anthropic Claude, OpenRouter, Groq, Gemini, or any OpenAI-compatible
 server) — inside Obsidian. The plugin adds a sidebar where you can ask
